@@ -1,14 +1,13 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
-#include <avr/io.h>
-#include <util/delay.h>
+#include <string.h>
 #include "serial.h"
 
 #define BAUD 38400
 #define FOSC 16000000
 #define UBBR (FOSC/(16*BAUD) - 1)
-
+//#define UBBR FOSC/16/BAUD-1
 //uint16_t ubbr = FOSC/(16*BAUD) - 1;
 
 void uart_init(void){
@@ -21,32 +20,31 @@ void uart_init(void){
     UCSR0B |= (1 << RXEN0);
     //Set frame format: 8data, 1stop bit (8N1)
     UCSR0C = (1<<UCSZ01)|(1<<UCSZ00);
-}
 
+    UCSR0C &= ~(1 << USBS0);
+}
 
 void uart_putchar(char chr){
     // Wait for empty transmit buffer
     while(!(UCSR0A & (1 << UDRE0))){ };
+    //loop_until_bit_is_set(UCSR0A, UDRE0);
     //Put data into buffer, sends the data
     UDR0 = chr;
 
-    if(chr == '\n'){
+    /*if(chr == '\n'){
         uart_putchar('\r');
+    }*/
+
+    if(chr == '\r'){
+        uart_putchar('\n');
     }
 
 }
 
 void uart_putstr(const char *str){
-    /*for(int i = 0; str[i] != '\0'; i++){
+    for(int i = 0; str[i] != '\0'; i++){
         uart_putchar(str[i]);
-    }*/
-    char chr = *str; // get character
-    uart_putchar(chr); //send character
-    while (chr != '\0'){
-        str++;             // increment the pointer
-        chr = *str;        // get next character
-        uart_putchar(chr); // send next character
-    }
+    }  
 }
 
 char uart_getchar(void){
@@ -59,11 +57,37 @@ char uart_getchar(void){
 
 void uart_echo(void){
     // Prints out what we enter in our terminal
-    uart_putchar(uart_getchar());
-    
+    char chr = uart_getchar();
+    _delay_ms(500);
+    uart_putchar(chr); 
 
-    //char chr = uart_getchar();
-    //uart_putchar(chr);
-        
-       
+    //uart_putchar(uart_getchar());
 }
+
+void ledOnOffUart(void){
+    char input[7];
+    int counter = 0;
+    char chr;
+
+    while((chr = uart_getchar()) != '\r'){
+        uart_putchar(chr);
+        input[counter] = chr;
+        counter++;
+    }
+    uart_putchar('\r');
+
+    input[counter] = '\r';
+    input[counter + 1] = '\n';
+    input[counter + 2] = '\0';
+
+    if(strncmp(input, "on\r\n", 4) == 0){
+        PORTB |= (1 << PORTB1);
+           
+    }
+    else if(strncmp(input, "off\r\n", 5) == 0){
+        PORTB &= ~(1 << PORTB1);
+    
+    }
+}
+
+

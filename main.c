@@ -1,18 +1,23 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 #include "serial.h"
 #include "blink.h"
 
 int main (void) {
-    //ledBlink();
+    
     uart_init();
+    DDRB |= (1 << DDB1);
     while(1){
+        //ledBlink();
         //uart_putchar('a');
-        //char *string = "hallo där\n";
-        //uart_putstr(string);
-        //uart_putstr("hej där\n");
-        uart_echo();
-        //_delay_ms(500);
+        //uart_putstr("Arturas Stanis\n");
+        //uart_getchar();
+        //uart_echo();
+        
+        ledOnOffUart();
     }
+    return 0;
 }
