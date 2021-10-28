@@ -2,6 +2,7 @@
 #include <util/delay.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h> 
 #include <stdbool.h>
 #include "serial.h"
 #include "blink.h"

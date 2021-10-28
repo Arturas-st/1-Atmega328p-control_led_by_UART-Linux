@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdint.h> 
 #include <stdio.h>
 #include <string.h>
 #include "serial.h"
@@ -20,7 +21,6 @@ void uart_init(void){
     UCSR0B |= (1 << RXEN0);
     //Set frame format: 8data, 1stop bit (8N1)
     UCSR0C = (1<<UCSZ01)|(1<<UCSZ00);
-
     UCSR0C &= ~(1 << USBS0);
 }
 
@@ -69,21 +69,24 @@ void ledOnOffUart(void){
     int counter = 0;
     char chr;
 
-    while((chr = uart_getchar()) != '\r'){
+    while((chr = uart_getchar()) != '\r'){ //Loops over the incoming characters as long as it is not carriage return character is entered when pressing enter
         uart_putchar(chr);
         input[counter] = chr;
         counter++;
     }
-    uart_putchar('\r');
+    uart_putchar('\r'); //sends \r to start from the beginning of the line
 
-    input[counter] = '\r';
+    //Adds \r and \n to the string
+    input[counter] = '\r'; 
     input[counter + 1] = '\n';
-    input[counter + 2] = '\0';
+    input[counter + 2] = '\0'; //zero-terminates to be able to use strcmp ().
 
+    //lights lamp if the string is equal to "ON\r\n"
     if(strncmp(input, "on\r\n", 4) == 0){
         PORTB |= (1 << PORTB1);
            
     }
+    //turns off light if the string is equal to "OFF\r\n"
     else if(strncmp(input, "off\r\n", 5) == 0){
         PORTB &= ~(1 << PORTB1);
     
