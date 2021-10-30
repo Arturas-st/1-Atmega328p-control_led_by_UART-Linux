@@ -10,5 +10,7 @@ char uart_getchar(void);
 
 void uart_echo(void);
 
+void ledOnOffUart(void);
+
 #endif
 

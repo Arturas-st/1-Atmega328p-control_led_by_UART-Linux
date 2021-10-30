@@ -82,13 +82,13 @@ void ledOnOffUart(void){
     input[counter + 2] = '\0'; //zero-terminates to be able to use strcmp ().
 
     //lights lamp if the string is equal to "ON\r\n"
-    if(strncmp(input, "on\r\n", 4) == 0){
-        PORTB |= (1 << PORTB1);
+    if(strncmp(input, "on\r\n", 4) == 0){ //write "off" in our rgb led case to turn on lamp
+        PORTB |= (1 << PORTB1);   
            
     }
     //turns off light if the string is equal to "OFF\r\n"
     else if(strncmp(input, "off\r\n", 5) == 0){
-        PORTB &= ~(1 << PORTB1);
+        PORTB &= ~(1 << PORTB1); //write "on" in our rgb led case to turn off lamp
     
     }
 }
